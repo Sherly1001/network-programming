@@ -78,6 +78,7 @@ int main() {
                 printf("This username existed.\n");
             } else {
                 printf("Created account, active required.\n");
+                save_acounts(&l, ACC_FILE);
             }
             break;
         case 2:
