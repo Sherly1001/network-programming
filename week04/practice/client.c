@@ -11,13 +11,24 @@ int main(int ag, char **av) {
         exit(1);
     }
 
-    int port = atoi(av[2]);
+    struct in_addr addr;
+    if (!inet_aton(av[1], &addr)) {
+        printf("wrong ip address format\n");
+        exit(1);
+    }
+
+    char *end = NULL;
+    long port = strtol(av[2], &end, 10);
+    if (end == av[2] || *end != '\0' || port < 0 || port > 65535) {
+        printf("wrong port format\n");
+        exit(1);
+    }
 
     struct sockaddr_in server_addr;
     socklen_t server_addr_len;
     server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = inet_addr(av[1]);
-    server_addr.sin_port = htons(port);
+    server_addr.sin_addr = addr;
+    server_addr.sin_port = port;
 
     int sdf = socket(AF_INET, SOCK_DGRAM, 0);
     if (sdf < 0) {
@@ -35,10 +46,12 @@ int main(int ag, char **av) {
 
         if (sendto(sdf, buff, strlen(buff), 0, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
             perror("\nSend error: ");
+            exit(1);
         }
 
         if ((res = recvfrom(sdf, buff, 1024, 0, (struct sockaddr*)&server_addr, &server_addr_len)) < 0) {
             perror("\nRecv error: ");
+            exit(1);
         }
         buff[res] = '\0';
         printf("\ngot a msg from server:\n%s\n\n", buff);
