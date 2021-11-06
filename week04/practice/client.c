@@ -28,7 +28,7 @@ int main(int ag, char **av) {
     socklen_t server_addr_len;
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr = addr;
-    server_addr.sin_port = port;
+    server_addr.sin_port = htons(port);
 
     int sdf = socket(AF_INET, SOCK_DGRAM, 0);
     if (sdf < 0) {
